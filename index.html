@@ -21,7 +21,8 @@
     </header>
     <section class="location-card"><div class="location-pin">⌖</div><div><small>YOU'RE EXPLORING</small><strong id="biome-label">Willowmere Pond</strong></div><span class="location-spark">✦</span></section>
     <section class="quest-card"><div class="quest-icon">♧</div><div><small>TODAY'S LITTLE QUEST</small><strong id="quest-text">Catch 3 fish for Marnie</strong><div class="quest-progress"><i id="quest-fill"></i></div></div><span id="quest-count">0/3</span></section>
-    <button class="icon-button journal-button" id="journal-button" aria-label="Open journal"><span>▤</span><small>JOURNAL</small></button>
+    <button class="icon-button aquarium-button" id="aquarium-button" aria-label="Open aquarium"><span>♒</span><small>AQUARIUM</small><b id="aquarium-count">0</b></button>
+      <button class="icon-button journal-button" id="journal-button" aria-label="Open journal"><span>▤</span><small>JOURNAL</small></button>
     <div class="toast" id="toast"></div>
     <div class="fish-notice" id="fish-notice"><span>〰</span><div><small>YOU'VE GOT A BITE!</small><strong>Reel it in!</strong></div><b>SPACE</b></div>
     <div class="inventory-strip" id="inventory-strip"><div class="rod-icon">⌁</div><div class="rod-info"><small>YOUR ROD</small><strong id="rod-name">Willow Rod <em>· Lv. 1</em></strong></div><div class="strip-divider"></div><button id="bait-button" class="bait-button"><span>🪱</span><span><small>BAIT · <b id="bait-name">Worm</b></small><strong id="bait-count">8 left</strong></span><i>⌄</i></button><button id="bag-button" class="bag-button"><span>▣</span><small>BAG <b id="bag-count">0</b></small></button></div>
@@ -30,7 +31,7 @@
     <div class="mobile-actions"><button id="action-button" class="action-button"><span>⌁</span><b>CAST</b></button><button id="move-button" class="small-action"><span>↗</span></button></div>
     <div class="panel-shade" id="panel-shade"></div>
     <section class="game-panel" id="game-panel" aria-live="polite"></section>
-    <div class="minigame" id="minigame"><div class="minigame-card"><div class="minigame-head"><span>✦</span><div><small>THE LINE IS TIGHT!</small><strong>Reel in your catch</strong></div><b id="reel-time">10</b></div><div class="reel-track"><i id="reel-fill"></i><span>✧</span></div><div class="minigame-help">Tap <b>REEL</b> when the bobber glows</div><button id="reel-button">REEL IN <span>↗</span></button></div></div>
+    <div class="minigame" id="minigame"><div class="minigame-card"><div class="minigame-head"><span>✦</span><div><small id="fight-caption">THE LINE IS TIGHT!</small><strong id="fight-title">Reel in your catch</strong></div><b id="reel-time">12</b></div><div class="fight-label"><span>LINE PROGRESS</span><b id="reel-percent">0%</b></div><div class="reel-track"><i id="reel-fill"></i><span>✧</span></div><div class="fight-label tension-label"><span>LINE TENSION · KEEP IT IN THE GREEN</span><b id="tension-value">35%</b></div><div class="tension-track" id="tension-track"><i id="tension-fill"></i><span class="tension-safe"></span></div><div class="minigame-help" id="fight-help">Tap REEL while tension is in the green zone. Ease off when it climbs!</div><button id="reel-button">REEL IN <span>↗</span></button></div></div>
   </main>
   <script src="game.js"></script>
 </body>
