@@ -16,3 +16,12 @@
 - 👤 [Explore the creator's projects](https://go.ondev.store/Brosario-Mandawson).
 - 🌍 [Create with OMGithub](https://go.ondev.store/).
 <!-- omgithub:readme:end -->
+
+## Neon Runner
+
+A complete, keyboard- and touch-playable arcade game. Open `index.html` in a browser (or run `python3 -m http.server 3002` and visit `http://localhost:3002`).
+
+- Move with **WASD**, **arrow keys**, the on-screen D-pad, or drag inside the arena.
+- Collect cyan shards for points and dodge the incoming pink pulses.
+- You have three shields. Press **Space** or **Escape** to pause.
+- Your personal best is saved in the browser.
