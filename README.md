@@ -22,6 +22,7 @@
 A complete, keyboard- and touch-playable arcade game. Open `index.html` in a browser (or run `python3 -m http.server 3002` and visit `http://localhost:3002`).
 
 - Move with **WASD**, **arrow keys**, the on-screen D-pad, or drag inside the arena.
-- Collect cyan shards for points and dodge the incoming pink pulses.
-- You have three shields. Press **Space** or **Escape** to pause.
+- Hold **Space** (or the touch **FIRE** button) to auto-aim and shoot incoming pink pulses.
+- Switch between **Blaster** (rapid), **Spread** (five-shot burst), and **Rail** (piercing) with **1/2/3** or the touch **SWAP** button.
+- Collect cyan shards for points and dodge whatever makes it through. You have three shields; **Escape** pauses.
 - Your personal best is saved in the browser.
