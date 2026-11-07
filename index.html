@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#071b26"><title>Moonwake — Wildwater</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game"><canvas id="world"></canvas><div class="vignette"></div>
+<header class="topbar"><div class="brand"><div class="brand-mark">✦</div><div><b>MOONWAKE</b><small>WILDS OF AURELIA</small></div></div><div class="top-stats"><div class="pill"><span class="coin">◈</span><b id="gold">120</b></div><div class="pill"><span>✧</span><b id="shards">3</b></div><div class="pill"><span>◆</span><b id="pearls">0</b></div><button class="icon-btn" id="soundBtn" aria-label="Toggle sound">♫</button></div></header>
+<div class="location"><span class="loc-dot"></span><div><strong>Glimmerlake</strong><small>MOONLIT SHALLOWS · LV. 1</small></div><button class="map-btn" id="mapBtn">⌖ <span>MAP</span></button></div>
+<div class="quest"><span class="quest-icon">✦</span><div><small>JOURNEY · 1/5</small><b id="questText">Catch your first fish</b></div><div class="quest-progress"><i id="questProgress"></i></div></div>
+<div class="right-stack"><button class="round-action" id="bagBtn"><span>▣</span><small>JOURNAL</small><i class="notify"></i></button><button class="round-action" id="gearBtn"><span>⚒</span><small>GEAR</small></button></div>
+<div class="scene-label"><i></i><span id="sceneStatus">THE WATER IS QUIET</span></div>
+<div class="bottom-ui"><div class="joystick-wrap"><div class="joy-ring" id="joy"><div class="joy-knob" id="knob"><span>✥</span></div></div><small>MOVE</small></div><div class="action-area"><div class="action-hint" id="actionHint">Cast into the glimmer...</div><button class="main-action" id="mainAction"><span class="action-icon">↗</span><span id="actionText">CAST LINE</span><kbd id="actionKey">TAP</kbd></button><div class="sub-actions"><button id="trainBtn"><span>♧</span> TRAIN</button><button id="battleBtn"><span>⚔</span> BATTLE</button></div></div></div>
+<div class="toast" id="toast"></div>
+<div class="modal-backdrop hidden" id="modal"><section class="modal"><button class="close" id="closeModal">×</button><div id="modalContent"></div></section></div>
+<div class="battle-hud hidden" id="battleHud"><div class="battle-top"><div><small>WILD ENCOUNTER</small><b id="enemyName">Gloomfin</b><div class="hp-track"><i id="enemyHp"></i></div></div><div class="vs">VS</div><div><small>YOUR COMPANION</small><b id="allyName">Finley</b><div class="hp-track ally"><i id="allyHp"></i></div></div></div><p id="battleMessage">A wild fish blocks your path!</p><div class="battle-actions"><button id="attackBtn">✦ <span>FIN SLAP</span><small>ATTACK</small></button><button id="guardBtn">◉ <span>GLOW GUARD</span><small>DEFEND</small></button><button id="snackBtn">♥ <span>STAR SNACK</span><small>HEAL</small></button></div></div>
+</div>
+<script type="module" src="game.js"></script>
+</body></html>

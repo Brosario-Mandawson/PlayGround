@@ -1,0 +1,118 @@
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const canvas=document.querySelector('#world');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
+const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x71a99d,.035);
+const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,100);camera.position.set(0,6.1,11.8);camera.lookAt(0,1.1,-.4);
+scene.add(new THREE.HemisphereLight(0xc9f2da,0x174952,2.1));const sun=new THREE.DirectionalLight(0xffe6ad,2.6);sun.position.set(-4,8,4);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);const fill=new THREE.PointLight(0x61d7ce,2.1,11);fill.position.set(2,2,2);scene.add(fill);
+const mat=(color,rough=.7,metal=0)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal});
+const waterMat=new THREE.MeshStandardMaterial({color:0x267d83,roughness:.22,metalness:.18,transparent:true,opacity:.91});
+const water=new THREE.Mesh(new THREE.PlaneGeometry(90,90,90,90),waterMat);water.rotation.x=-Math.PI/2;water.position.y=-.12;water.receiveShadow=true;scene.add(water);
+const ground=new THREE.Mesh(new THREE.CircleGeometry(5.5,48),mat(0x58785d));ground.rotation.x=-Math.PI/2;ground.position.set(0,-.35,-8);scene.add(ground);
+const hillMat=mat(0x4e7864);for(let i=0;i<9;i++){let h=1.4+Math.random()*1.5;const hill=new THREE.Mesh(new THREE.ConeGeometry(1.7+Math.random(),h,6),hillMat);hill.position.set(-9+i*2.3,-.4+h/2,-8-Math.random()*2);hill.rotation.y=Math.random()*2;scene.add(hill)}
+const wood=mat(0x80563c),woodLight=mat(0xb28152),dark=mat(0x3c3934),leafMats=[mat(0x35694f),mat(0x4d805a),mat(0x73905b)];
+const dock=new THREE.Group();scene.add(dock);for(let i=0;i<8;i++){const p=new THREE.Mesh(new THREE.BoxGeometry(1.15,.16,.42),i%2?wood:woodLight);p.position.set(0,-.05,1.35+i*.42);p.castShadow=true;p.receiveShadow=true;dock.add(p)}for(const x of [-.61,.61])for(const z of [1.5,4.0]){let post=new THREE.Mesh(new THREE.CylinderGeometry(.09,.12,.8,8),wood);post.position.set(x,-.1,z);dock.add(post)}
+const player=new THREE.Group();scene.add(player);player.position.set(0,0,2.55);
+const body=new THREE.Mesh(new THREE.CapsuleGeometry(.28,.65,4,8),mat(0x3d7980));body.position.y=.79;body.castShadow=true;player.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.23,12,10),mat(0xe5bd91));head.position.y=1.37;head.castShadow=true;player.add(head);const hat=new THREE.Mesh(new THREE.ConeGeometry(.28,.28,8),mat(0xd99b58));hat.position.y=1.63;player.add(hat);
+const rod=new THREE.Group();const rodMat=mat(0x503b2b);const rodBase=new THREE.Mesh(new THREE.CylinderGeometry(.035,.05,1.9,7),rodMat);rodBase.rotation.z=-.42;rodBase.position.set(.35,1.35,-.2);rod.add(rodBase);const lineMat=new THREE.LineBasicMaterial({color:0xe9f3d9,transparent:true,opacity:.72});let lineGeom=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(.6,2.1,-.4),new THREE.Vector3(1,1,-1.7)]);const line=new THREE.Line(lineGeom,lineMat);rod.add(line);player.add(rod);
+function tree(x,z,s=1){const g=new THREE.Group();g.position.set(x,-.34,z);const tr=new THREE.Mesh(new THREE.CylinderGeometry(.12*s,.2*s,1.2*s,7),wood);tr.position.y=.6*s;g.add(tr);for(let i=0;i<3;i++){let c=new THREE.Mesh(new THREE.IcosahedronGeometry((.72-i*.1)*s,1),leafMats[(i+Math.floor(Math.random()*3))%3]);c.position.set((Math.random()-.5)*.4*s,(1.2+i*.45)*s,(Math.random()-.5)*.35*s);c.castShadow=true;g.add(c)}scene.add(g)}
+tree(-4,-5,1.25);tree(4,-5,1.4);tree(-6,-3,.9);tree(6,-2,1.1);
+function lantern(x,z){const pole=new THREE.Mesh(new THREE.CylinderGeometry(.035,.055,1.6,6),dark);pole.position.set(x,.8,z);scene.add(pole);const l=new THREE.Mesh(new THREE.SphereGeometry(.16,12,10),new THREE.MeshBasicMaterial({color:0xffd686}));l.position.set(x,1.68,z);scene.add(l);const glow=new THREE.PointLight(0xffcf78,1.8,4);glow.position.copy(l.position);scene.add(glow)}lantern(-1,3.8);lantern(1,3.8);
+for(let i=0;i<24;i++){let x=(Math.random()-.5)*13,z=-2.5-Math.random()*2;if(Math.abs(x)<2)continue;const r=new THREE.Mesh(new THREE.CylinderGeometry(.025,.045,.45+Math.random()*.55,5),mat(i%2?0x789565:0x92a45e));r.position.set(x,.15,z);r.rotation.z=(Math.random()-.5)*.35;scene.add(r)}
+const kinds=[{name:'Moonfin',color:0x68dbc6,rarity:'COMMON',hp:30,power:8},{name:'Ember Koi',color:0xf28d66,rarity:'RARE',hp:42,power:11},{name:'Starwhisker',color:0x9c9bfa,rarity:'MAGICAL',hp:36,power:10},{name:'Gloomfin',color:0x7398bb,rarity:'WILD',hp:32,power:9}];
+function makeFish(color,size=1){const g=new THREE.Group();const body=new THREE.Mesh(new THREE.SphereGeometry(1,18,14),new THREE.MeshStandardMaterial({color,roughness:.27,metalness:.17,emissive:color,emissiveIntensity:.07}));body.scale.set(size*.64,size*.37,size*.27);body.castShadow=true;g.add(body);const tail=new THREE.Mesh(new THREE.ConeGeometry(size*.31,size*.45,3),body.material);tail.rotation.z=-Math.PI/2;tail.position.x=-size*.66;tail.scale.y=.7;g.add(tail);for(const side of [-1,1]){const eye=new THREE.Mesh(new THREE.SphereGeometry(size*.075,10,8),mat(0xfff0cf,.25));eye.position.set(size*.39,size*.09,side*size*.19);g.add(eye);const pupil=new THREE.Mesh(new THREE.SphereGeometry(size*.035,8,6),mat(0x172b37,.15));pupil.position.set(size*.42,size*.09,side*size*.24);g.add(pupil);const fin=new THREE.Mesh(new THREE.ConeGeometry(size*.14,size*.3,3),body.material);fin.position.set(0,-size*.19,side*size*.2);fin.rotation.x=side*.65;g.add(fin)}return g}
+const swimmers=[];for(let i=0;i<7;i++){const kind=kinds[i%3];const f=makeFish(kind.color,.55+Math.random()*.32);f.position.set((Math.random()-.5)*7,-.35-Math.random()*.4,-1-Math.random()*3);scene.add(f);swimmers.push({mesh:f,phase:Math.random()*6,speed:.35+Math.random()*.4,origin:f.position.x})}
+const motes=[];for(let i=0;i<34;i++){const m=new THREE.Mesh(new THREE.SphereGeometry(.018+Math.random()*.025,6,6),new THREE.MeshBasicMaterial({color:i%3===0?0xffdda0:0xc0f3db,transparent:true,opacity:.35+Math.random()*.4}));m.position.set((Math.random()-.5)*12,Math.random()*3-1,(Math.random()-.5)*10-1);scene.add(m);motes.push({mesh:m,phase:Math.random()*8})}
+
+// ---------- State ----------
+let fishCaught=[],gold=120,shards=3,pearls=0,gearLevel=1,baitLevel=0,netLevel=0,charmLevel=0,selected=0,casting=false,castTimer=0,castPhase=0,joystick={x:0,y:0},toastTimer,questStep=0,battle=null,moveX=0,moveZ=0;
+const boats=[
+ {id:'skiff',name:'Drift Skiff',emoji:'⛵',cost:0,speed:1.0,luck:0,owned:true,desc:'A humble rowboat. Reliable and free.'},
+ {id:'koi',name:'Koi Runner',emoji:'🚤',cost:260,speed:1.25,luck:.05,owned:false,desc:'Faster hull, +5% rare catch chance.'},
+ {id:'moon',name:'Moonwhale Dinghy',emoji:'🌙',cost:620,speed:1.15,luck:.12,owned:false,desc:'Glows with lunar luck, +12% rare.'},
+ {id:'storm',name:'Stormchaser',emoji:'⛈',cost:1400,speed:1.55,luck:.08,owned:false,desc:'Fastest boat, +8% rare, deep waters.'}
+];
+let selectedBoat=0;
+const charms=[
+ {name:'Fin Amulet',cost:180,bonus:'ally power +2',apply:f=>f.power+=2},
+ {name:'Tide Charm',cost:320,bonus:'ally HP +12',apply:f=>f.hp+=12},
+ {name:'Star Pendant',cost:520,bonus:'heal +8',apply:()=>{}}
+];
+let ownedCharms=[];
+
+// ---------- Boat mesh ----------
+const boatGroup=new THREE.Group();scene.add(boatGroup);
+function buildBoat(b){
+  boatGroup.clear();
+  const hullColor=b.id==='storm'?0x4a6f88:b.id==='moon'?0x8a7fc9:b.id==='koi'?0xd9a066:0x7a5a3a;
+  const hull=new THREE.Mesh(new THREE.BoxGeometry(1.6,.22,3.2),mat(hullColor,.55,.15));hull.position.y=-.05;hull.castShadow=true;boatGroup.add(hull);
+  const deck=new THREE.Mesh(new THREE.BoxGeometry(1.3,.08,2.4),mat(0xc9a878,.7));deck.position.y=.1;boatGroup.add(deck);
+  const mast=new THREE.Mesh(new THREE.CylinderGeometry(.04,.05,1.6,6),wood);mast.position.set(0,.9,0);boatGroup.add(mast);
+  const sail=new THREE.Mesh(new THREE.PlaneGeometry(1.1,1.3),new THREE.MeshStandardMaterial({color:0xf4e9c8,side:THREE.DoubleSide,transparent:true,opacity:.85}));sail.position.set(0,1.05,.1);boatGroup.add(sail);
+  const flag=new THREE.Mesh(new THREE.ConeGeometry(.18,.32,3),mat(0xffd27a));flag.rotation.z=-Math.PI/2;flag.position.set(.18,1.75,0);boatGroup.add(flag);
+}
+buildBoat(boats[selectedBoat]);
+boatGroup.position.set(0,-.18,1.0);
+boatGroup.rotation.y=Math.PI;
+
+const $=s=>document.querySelector(s),toast=t=>{const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2100)};
+function sync(){ $('#gold').textContent=gold;$('#shards').textContent=shards;$('#pearls').textContent=pearls;$('#questText').textContent=questStep===0?'Catch your first fish':questStep===1?'Train a new companion':questStep===2?'Win a wild encounter':'Explore the lake';$('#questProgress').style.width=(questStep*25)+'%'; }
+function catchFish(){casting=false;const rareRoll=Math.random();let pool=kinds.slice(0,3);if(rareRoll<.18+baitLevel*.06+boats[selectedBoat].luck)pool=[kinds[1],kinds[2]];const kind=pool[Math.floor(Math.random()*pool.length)];const fish={...kind,id:Date.now(),level:1,xp:0};fishCaught.push(fish);gold+=18+netLevel*6;shards+=Math.random()<.35?1:0;if(Math.random()<.12)pearls++;sync();const f=makeFish(kind.color,1.15);f.position.set(0,.8,0);scene.add(f);const start=performance.now();const spin=()=>{let t=(performance.now()-start)/1000;f.rotation.y=t*3;f.position.y=.8+Math.sin(t*5)*.12;f.scale.setScalar(Math.max(0,1-t/1.1));if(t<1.1)requestAnimationFrame(spin);else scene.remove(f)};spin();toast(`✦ ${kind.name} caught! +${18+netLevel*6} coins`);$('#actionHint').textContent='A new friend joins your journal';if(questStep===0)questStep=1;sync()}
+function startCast(){if(battle)return;if(casting){if(castPhase===1&&castTimer>1.8){catchFish()}else if(castPhase===2){clearTimeout(window.biteTimeout);catchFish()}else toast('Wait for a ripple...');return}casting=true;castPhase=1;castTimer=0;$('#actionText').textContent='WAIT FOR A BITE';$('#actionKey').textContent='REEL';$('#actionHint').textContent='Watch the water for a shimmer';$('#sceneStatus').textContent='LINE CAST · WAIT FOR A BITE';rod.rotation.x=-.35;const wait=Math.max(900,1700+Math.random()*2500-gearLevel*180);window.biteTimeout=setTimeout(()=>{if(!casting)return;castPhase=2;$('#actionText').textContent='REEL IT IN!';$('#actionHint').textContent='Now! Tap to reel in your catch';$('#sceneStatus').textContent='SOMETHING IS ON THE LINE!';toast('✦ A bite! Reel it in!');setTimeout(()=>{if(casting&&castPhase===2){casting=false;castPhase=0;resetCast();toast('It slipped away... try again!')}},2200)},wait)}
+function resetCast(){castPhase=0;rod.rotation.x=0;$('#actionText').textContent='CAST LINE';$('#actionKey').textContent='TAP';$('#actionHint').textContent='Cast into the glimmer...';$('#sceneStatus').textContent='THE WATER IS QUIET'}
+$('#mainAction').addEventListener('click',startCast);
+function modal(title,eyebrow,html){$('#modalContent').innerHTML=`<div class="eyebrow">${eyebrow}</div><h2>${title}</h2>${html}`;$('#modal').classList.remove('hidden')}
+$('#closeModal').onclick=()=>$('#modal').classList.add('hidden');$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')$('#modal').classList.add('hidden')});
+function journal(){let html=fishCaught.length?fishCaught.map((f,i)=>`<div class="fish-card"><div class="fish-emoji">${f.name==='Ember Koi'?'🐠':f.name==='Starwhisker'?'🐟':'🐡'}</div><div class="fish-info"><b>${f.name} <span style="color:#ffdc91;font-size:9px">${f.rarity}</span></b><small>Level ${f.level} · ${f.xp}/3 training sparks</small><div class="stat-line">❤ ${f.hp} &nbsp; ✦ ${f.power} power</div></div><button class="tiny-btn" onclick="window.selectFish(${i})">${selected===i?'ACTIVE':'SELECT'}</button></div>`).join(''):'<p>Your journal is waiting for its first finned friend. Cast into the lake to find a companion!</p>';modal('Fish Journal',`${fishCaught.length} COMPANION${fishCaught.length===1?'':'S'} DISCOVERED`,html)}
+window.selectFish=i=>{selected=i;$('#modal').classList.add('hidden');toast(`${fishCaught[i].name} is ready for adventure`)};$('#bagBtn').onclick=journal;
+
+// ---------- Shop ----------
+let shopTab='boats';
+function shop(){modal('Harbor Shop','BUY · UPGRADE · EQUIP',`<div class="shop-tabs"><button class="${shopTab==='boats'?'active':''}" onclick="window.setShopTab('boats')">BOATS</button><button class="${shopTab==='rods'?'active':''}" onclick="window.setShopTab('rods')">RODS</button><button class="${shopTab==='gear'?'active':''}" onclick="window.setShopTab('gear')">GEAR</button><button class="${shopTab==='charms'?'active':''}" onclick="window.setShopTab('charms')">CHARMS</button></div><div id="shopBody"></div><p class="shop-wallet">Coins ${gold} ◈ · Shards ${shards} ✧ · Pearls ${pearls} ◆</p>`);renderShop()}
+window.setShopTab=t=>{shopTab=t;shop()};
+function renderShop(){
+ const body=$('#shopBody'); if(!body) return;
+ if(shopTab==='boats'){
+   body.innerHTML=boats.map((b,i)=>{
+     const btn=b.owned
+       ? '<button class="tiny-btn" onclick="window.equipBoat('+i+')">'+(selectedBoat===i?'EQUIPPED':'EQUIP')+'</button>'
+       : '<button class="tiny-btn" onclick="window.buyBoat('+i+')">BUY - '+b.cost+' coins</button>';
+     return '<div class="shop-item"><div class="shop-icon">'+b.emoji+'</div><div class="shop-info"><b>'+b.name+'</b><small>'+b.desc+'</small><div class="stat-line">Speed x'+b.speed+' - Luck +'+Math.round(b.luck*100)+'%</div></div>'+btn+'</div>';
+   }).join('');
+ } else if(shopTab==='rods'){
+   const items=[{name:'Moonbloom Rod',lvl:gearLevel,cost:60*gearLevel,desc:'Faster bites, better rewards',icon:'R'},{name:'Starlure Bait',lvl:baitLevel,cost:45*(baitLevel+1),desc:'Higher rare catch chance',icon:'B'},{name:'Silver Net',lvl:netLevel,cost:80*(netLevel+1),desc:'+6 coins per catch',icon:'N'}];
+   body.innerHTML=items.map((it,idx)=>'<div class="shop-item"><div class="shop-icon">'+it.icon+'</div><div class="shop-info"><b>'+it.name+' - Lv.'+it.lvl+'</b><small>'+it.desc+'</small></div><button class="tiny-btn" onclick="window.upgradeItem('+idx+')">UPGRADE - '+it.cost+' coins</button></div>').join('');
+ } else if(shopTab==='gear'){
+   body.innerHTML='<div class="shop-item"><div class="shop-icon">Boots</div><div class="shop-info"><b>Swift Boots</b><small>Faster walking (passive)</small><div class="stat-line">Movement +'+Math.round((boats[selectedBoat].speed-1)*100+20)+'%</div></div></div>'
+     +'<div class="shop-item"><div class="shop-icon">Shield</div><div class="shop-info"><b>Guard Shell</b><small>Reduces battle damage by 15%</small></div><button class="tiny-btn" onclick="toast(&quot;Guard Shell equipped!&quot;)">EQUIP</button></div>';
+ } else {
+   body.innerHTML=charms.map((c,i)=>{
+     const btn=ownedCharms.includes(i)?'<span class="owned-tag">OWNED</span>':'<button class="tiny-btn" onclick="window.buyCharm('+i+')">BUY - '+c.cost+' coins</button>';
+     return '<div class="shop-item"><div class="shop-icon">Charm</div><div class="shop-info"><b>'+c.name+'</b><small>'+c.bonus+'</small></div>'+btn+'</div>';
+   }).join('');
+ }
+ setTimeout(()=>{},0);
+}
+window.buyBoat=i=>{const b=boats[i];if(gold<b.cost)return toast('Not enough coins');gold-=b.cost;b.owned=true;toast(`${b.name} purchased!`);sync();shop()};
+window.equipBoat=i=>{if(!boats[i].owned)return;selectedBoat=i;buildBoat(boats[i]);boatGroup.position.set(0,-.18,1.0);toast(`${boats[i].name} equipped`);sync();shop()};
+window.upgradeItem=idx=>{if(idx===0){let cost=60*gearLevel;if(gold<cost)return toast('Not enough coins');gold-=cost;gearLevel++;toast('Rod upgraded!')}else if(idx===1){let cost=45*(baitLevel+1);if(gold<cost)return toast('Not enough coins');gold-=cost;baitLevel++;toast('Bait upgraded!')}else{let cost=80*(netLevel+1);if(gold<cost)return toast('Not enough coins');gold-=cost;netLevel++;toast('Net upgraded!')}sync();shop()};
+window.buyCharm=i=>{const c=charms[i];if(gold<c.cost)return toast('Not enough coins');gold-=c.cost;ownedCharms.push(i);if(i===0&&fishCaught[selected])fishCaught[selected].power+=2;if(i===1&&fishCaught[selected])fishCaught[selected].hp+=12;toast(`${c.name} acquired!`);sync();shop()};
+$('#gearBtn').onclick=shop;
+
+$('#trainBtn').onclick=()=>{if(!fishCaught.length)return toast('Catch a fish first to train it!');let f=fishCaught[selected];if(gold<25)return toast('Training needs 25 coins');gold-=25;f.xp++;if(f.xp>=3){f.xp=0;f.level++;f.hp+=8;f.power+=3;toast(`${f.name} leveled up to ${f.level}! ✦`)}else toast(`${f.name} learned a new trick! (${f.xp}/3)`);if(questStep===1)questStep=2;sync()};
+
+const enemyMesh=makeFish(kinds[3].color,1.3);enemyMesh.position.set(0,.35,-1);enemyMesh.visible=false;scene.add(enemyMesh);const allyMesh=makeFish(0x68dbc6,1.15);allyMesh.position.set(-1.6,.6,1.3);allyMesh.visible=false;scene.add(allyMesh);
+function beginBattle(){if(!fishCaught.length)return toast('Catch a fish companion before battling!');if(battle)return;let f=fishCaught[selected];const e=kinds[3];battle={ally:f,allyHp:f.hp+(f.level-1)*8,maxAlly:f.hp+(f.level-1)*8,enemyHp:e.hp+Math.floor(Math.random()*14),maxEnemy:e.hp+14,enemyPower:e.power+Math.floor(Math.random()*3),turn:0,guard:false};enemyMesh.visible=allyMesh.visible=true;$('#enemyName').textContent=e.name;$('#allyName').textContent=f.name;$('#battleHud').classList.remove('hidden');$('#battleMessage').textContent=`A wild ${e.name} swims in to challenge you!`;syncBattle();$('#sceneStatus').textContent='WILD ENCOUNTER';}
+function syncBattle(){if(!battle)return;$('#enemyHp').style.width=Math.max(0,battle.enemyHp/battle.maxEnemy*100)+'%';$('#allyHp').style.width=Math.max(0,battle.allyHp/battle.maxAlly*100)+'%'}
+function endBattle(win){$('#battleHud').classList.add('hidden');enemyMesh.visible=allyMesh.visible=false;if(win){gold+=45;shards++;pearls+=Math.random()<.4?1:0;toast('Victory! +45 coins, shard & maybe a pearl ✦');if(questStep===2)questStep=3}else toast('Your companion needs a rest. Train and try again.');battle=null;sync();$('#sceneStatus').textContent='THE WATER IS QUIET'}
+function enemyTurn(){if(!battle)return;let damage=battle.enemyPower;if(ownedCharms.includes(2))damage=Math.max(2,Math.floor(damage*.85));if(battle.guard)damage=Math.max(2,Math.floor(damage*.35));battle.allyHp-=damage;battle.guard=false;syncBattle();if(battle.allyHp<=0){$('#battleMessage').textContent=`${battle.ally.name} needs a breather...`;setTimeout(()=>endBattle(false),800)}else $('#battleMessage').textContent=`${kinds[3].name} splashes for ${damage} damage! Your turn.`}
+$('#battleBtn').onclick=beginBattle;$('#attackBtn').onclick=()=>{if(!battle)return;let damage=battle.ally.power+battle.ally.level*2+Math.floor(Math.random()*5);battle.enemyHp-=damage;allyMesh.rotation.y+=.8;syncBattle();if(battle.enemyHp<=0){$('#battleMessage').textContent='You won the wild encounter!';setTimeout(()=>endBattle(true),700)}else{battle.turn++;$('#battleMessage').textContent=`${battle.ally.name} strikes for ${damage} damage!`;setTimeout(enemyTurn,700)}};$('#guardBtn').onclick=()=>{if(!battle)return;battle.guard=true;$('#battleMessage').textContent=`${battle.ally.name} glows with a protective ward!`;setTimeout(enemyTurn,650)};$('#snackBtn').onclick=()=>{if(!battle)return;if(shards<1)return toast('You need a star shard to heal');shards--;let heal=22+ownedCharms.includes(2)?8:0;let n=Math.min(heal,battle.maxAlly-battle.allyHp);battle.allyHp+=n;syncBattle();$('#battleMessage').textContent=`Star snack restores ${n} hearts!`;setTimeout(enemyTurn,650)};
+$('#mapBtn').onclick=()=>modal('Wildwater Atlas','AURELIA · NORTH SHORE',`<div class="fish-card"><div class="fish-emoji">🌙</div><div class="fish-info"><b>Glimmerlake</b><small>Current location · calm waters · 3 fish species</small></div><span style="color:#8fe0bc">✓</span></div><div class="fish-card" style="opacity:.55"><div class="fish-emoji">🌲</div><div class="fish-info"><b>Whispering Fen</b><small>Unlock at companion level 3</small></div><span>🔒</span></div><div class="fish-card" style="opacity:.42"><div class="fish-emoji">⛰</div><div class="fish-info"><b>Dragon's Reach</b><small>Unlock after your first victory</small></div><span>🔒</span></div><p>Move with the joystick to explore your shore. More waters await!</p>`);
+$('#soundBtn').onclick=e=>{e.currentTarget.textContent=e.currentTarget.textContent==='♫'?'♪':'♫';toast('The lake hums softly...')};
+
+const joy=$('#joy'),knob=$('#knob');let pointer=null;joy.addEventListener('pointerdown',e=>{pointer=e.pointerId;joy.setPointerCapture(pointer);updateJoy(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===pointer)updateJoy(e)});for(const ev of ['pointerup','pointercancel'])joy.addEventListener(ev,e=>{if(e.pointerId===pointer){pointer=null;joystick.x=joystick.y=0;knob.style.transform='translate(0,0)'}});function updateJoy(e){let r=joy.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.hypot(dx,dy),max=27;if(d>max){dx*=max/d;dy*=max/d}knob.style.transform=`translate(${dx}px,${dy}px)`;joystick.x=dx/max;joystick.y=dy/max}
+let clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);let t=clock.getElapsedTime(),dt=Math.min(clock.getDelta(),.04);waterMat.color.setHSL(.49+.018*Math.sin(t*.2),.53,.31);water.position.y=-.13+Math.sin(t*.65)*.025;for(let i=0;i<swimmers.length;i++){const s=swimmers[i];s.mesh.position.x=s.origin+Math.sin(t*s.speed+s.phase)*.85;s.mesh.position.y=-.4+Math.sin(t*2+s.phase)*.09;s.mesh.rotation.y=Math.cos(t*s.speed+s.phase)*.12;s.mesh.rotation.z=Math.sin(t*2+s.phase)*.03}for(const m of motes){m.mesh.position.y+=Math.sin(t*1.1+m.phase)*.0015;m.mesh.material.opacity=.25+(.2*Math.sin(t*2+m.phase))}const speedMult=boats[selectedBoat].speed*1.4;moveX+=(joystick.x-moveX)*Math.min(1,dt*8);moveZ+=(joystick.y-moveZ)*Math.min(1,dt*8);player.position.x=THREE.MathUtils.clamp(player.position.x+moveX*dt*speedMult,-1.35,1.35);player.position.z=THREE.MathUtils.clamp(player.position.z+moveZ*dt*speedMult*0.8,1.3,3.05);if(Math.abs(moveX)>.06)player.rotation.y=moveX*.18;boatGroup.position.x=player.position.x*.3;boatGroup.rotation.y=Math.PI+Math.sin(t*.4)*.05;if(casting&&castPhase===1)castTimer+=dt;enemyMesh.rotation.y=Math.sin(t*2)*.12;allyMesh.rotation.y=Math.sin(t*2+1)*.12;renderer.render(scene,camera)}animate();
+function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.7))}addEventListener('resize',resize);sync();
+// shop styles injected
+const style=document.createElement('style');style.textContent='.shop-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}.shop-tabs button{flex:1;min-width:70px;padding:8px;border-radius:9px;background:#0b303bd9;border:1px solid #d9f3dc3d;color:#deeee0;font-size:9px;letter-spacing:1px}.shop-tabs button.active{background:#d8b66c33;border-color:#e1d19a;color:#ffe2a2}.shop-item{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #d7ecdc1b}.shop-icon{width:40px;height:40px;display:grid;place-items:center;font-size:22px;border-radius:10px;background:#80d2bc21}.shop-info{flex:1}.shop-info b{font:600 12px "Space Grotesk"}.shop-info small{display:block;color:#a7cec0;font-size:10px;margin-top:3px}.owned-tag{color:#8fe0bc;font-size:9px;letter-spacing:1px}.shop-wallet{font-size:10px;color:#ffd27a;margin-top:12px;text-align:center}';document.head.appendChild(style);
